@@ -1,5 +1,6 @@
 package com.openclassrooms.vitesse.presentation.screens.candidates.add
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openclassrooms.vitesse.data.dao.CandidateDao
@@ -30,7 +31,7 @@ class AddCandidateViewModel(
         val expectedSalary = _state.value.expectedSalary
         val notes = _state.value.notes
 
-        if (firstName.isBlank() || lastName.isBlank() || phoneNumber.isBlank() || email.isBlank() || birthDate == null || expectedSalary.isBlank()) {
+        if (firstName.isBlank() || lastName.isBlank() || phoneNumber.isBlank() || email.isBlank() || birthDate == null) {
           return
         }
 
@@ -40,13 +41,14 @@ class AddCandidateViewModel(
           phoneNumber = phoneNumber,
           email = email,
           birthDate = birthDate,
-          expectedSalary = expectedSalary.toInt(),
+          expectedSalary = expectedSalary.toIntOrNull() ?: 0,
           notes = notes
         )
 
         // Save candidate to database
         viewModelScope.launch {
           dao.upsertCandidate(candidate)
+          Log.d("AddCandidateViewModel", "Candidate saved: $candidate")
         }
 
         // Reset fields after saving

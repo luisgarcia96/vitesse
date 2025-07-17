@@ -20,15 +20,18 @@ fun AppNavGraph(
 ) {
   val navController = rememberNavController()
 
-  NavHost(navController, startDestination) {
+  NavHost(navController = navController, startDestination = startDestination) {
     composable(CandidateRoutes.LIST) {
       CandidatesListScreen(
-        onAddCandidate = { navController.navigate(CandidateRoutes.ADD) }
+        dao = candidateDao,
+        onAddCandidate = {
+          navController.navigate(CandidateRoutes.ADD)
+        }
       )
     }
     composable(CandidateRoutes.ADD) {
       AddCandidateScreen(
-        dao    = candidateDao,
+        dao = candidateDao,
         onBack = { navController.popBackStack() }
       )
     }
