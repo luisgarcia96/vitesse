@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.openclassrooms.vitesse.data.dao.CandidateDao
 import com.openclassrooms.vitesse.data.entity.Candidate
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -13,10 +15,12 @@ class AddCandidateViewModel(
 ): ViewModel() {
 
   private val _state = MutableStateFlow(AddCandidateState())
+  val state: StateFlow<AddCandidateState> = _state.asStateFlow()
 
   fun onEvent(event: AddCandidateEvent) {
     when (event) {
       AddCandidateEvent.Cancel -> TODO()
+
       AddCandidateEvent.SaveCandidate -> {
         val firstName = _state.value.firstName
         val lastName = _state.value.lastName
