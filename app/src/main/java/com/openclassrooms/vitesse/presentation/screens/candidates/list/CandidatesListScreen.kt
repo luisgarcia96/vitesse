@@ -21,6 +21,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -74,31 +76,49 @@ private fun CandidatesListContent(
   onAddCandidate: () -> Unit
 ) {
   var query by rememberSaveable { mutableStateOf("") }
+  var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
   Scaffold(
     topBar = {
-      CenterAlignedTopAppBar(
-        modifier = Modifier
-          .padding( top = 16.dp),
-        title = {
-          Box(
-            modifier = Modifier
-              .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-          ) {
-            OutlinedTextField(
-              value = query,
-              onValueChange = { query = it },
-              placeholder = { Text(stringResource(R.string.search_candidate)) },
-              singleLine = true,
-              shape = CircleShape,
-              trailingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) },
+      Column {
+        CenterAlignedTopAppBar(
+          modifier = Modifier
+            .padding(top = 16.dp),
+          title = {
+            Box(
               modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-            )
+                .fillMaxWidth(),
+              contentAlignment = Alignment.Center
+            ) {
+              OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                placeholder = { Text(stringResource(R.string.search_candidate)) },
+                singleLine = true,
+                shape = CircleShape,
+                trailingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = null) },
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .height(56.dp)
+              )
+            }
           }
+        )
+        TabRow(
+          selectedTabIndex = selectedTabIndex,
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Tab(
+            selected = selectedTabIndex == 0,
+            onClick = { selectedTabIndex = 0 },
+            text = { Text("All") }
+          )
+          Tab(
+            selected = selectedTabIndex == 1,
+            onClick = { selectedTabIndex = 1 },
+            text = { Text("Favorites") }
+          )
         }
-      )
+      }
     },
     floatingActionButton = {
       Button(onClick = onAddCandidate) {
@@ -106,7 +126,13 @@ private fun CandidatesListContent(
       }
     }
   ) { paddingValues ->
-    if (candidates.isEmpty()) {
+    val source = if (selectedTabIndex == 0) candidates else emptyList()
+    val filtered = if (query.isBlank()) source else source.filter { c ->
+      "${c.firstName} ${c.lastName}".contains(query, ignoreCase = true) ||
+      (c.notes?.contains(query, ignoreCase = true) == true)
+    }
+
+    if (filtered.isEmpty()) {
       Box(
         modifier = Modifier
           .padding(paddingValues)
@@ -116,10 +142,6 @@ private fun CandidatesListContent(
         Text(stringResource(R.string.no_candidate))
       }
     } else {
-      val filtered = if (query.isBlank()) candidates else candidates.filter { c ->
-        "${c.firstName} ${c.lastName}".contains(query, ignoreCase = true) ||
-        (c.notes?.contains(query, ignoreCase = true) == true)
-      }
       LazyColumn(
         modifier = Modifier.padding(paddingValues),
         contentPadding = PaddingValues(16.dp)
