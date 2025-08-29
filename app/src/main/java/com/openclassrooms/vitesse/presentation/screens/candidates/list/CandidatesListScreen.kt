@@ -110,12 +110,12 @@ private fun CandidatesListContent(
           Tab(
             selected = selectedTabIndex == 0,
             onClick = { selectedTabIndex = 0 },
-            text = { Text("All") }
+            text = { Text(stringResource(R.string.all)) }
           )
           Tab(
             selected = selectedTabIndex == 1,
             onClick = { selectedTabIndex = 1 },
-            text = { Text("Favorites") }
+            text = { Text(stringResource(R.string.favorites)) }
           )
         }
       }
@@ -190,7 +190,9 @@ private fun CandidateItem(
       if (!candidate.notes.isNullOrBlank()) {
         Text(
           text = candidate.notes,
-          style = MaterialTheme.typography.bodyMedium
+          style = MaterialTheme.typography.bodyMedium,
+          maxLines = 2,
+          overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
         )
       }
     }
@@ -213,7 +215,7 @@ private fun CandidatesList_WithItems_Preview() {
     candidates = listOf(
       CandidateUi("Ada", "Lovelace", "Math pioneer"),
       CandidateUi("Alan", "Turing", "Father of AI"),
-      CandidateUi("Grace", "Hopper", "COBOL inventor")
+      CandidateUi("Grace", "Hopper", "Long description here so it can be truncated at the second line blablabla boiznzefu kjherz zoz zn'")
     ),
     onAddCandidate = {}
   )

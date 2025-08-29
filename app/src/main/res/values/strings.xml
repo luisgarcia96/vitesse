@@ -14,4 +14,6 @@
     <string name="add_candidate">Add candidate</string>
     <string name="no_candidate">No candidate</string>
     <string name="search_candidate">Search candidate</string>
+    <string name="all">All</string>
+    <string name="favorites">Favorites</string>
 </resources>

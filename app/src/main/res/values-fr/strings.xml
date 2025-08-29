@@ -15,4 +15,6 @@
     <string name="add_candidate">Ajouter un candidat</string>
     <string name="no_candidate">Aucun candidat</string>
     <string name="search_candidate">Rechercher un candidat</string>
+    <string name="all">Tous</string>
+    <string name="favorites">Favoris</string>
 </resources>
