@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import com.openclassrooms.vitesse.data.dao.CandidateDao
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.Period
 import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,11 +80,24 @@ private fun AddCandidateContent(
   val context = LocalContext.current
   var showDatePicker by remember { mutableStateOf(false) }
 
+  val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
+
+  var dateText by remember { mutableStateOf(birthDate?.format(dateFormatter) ?: "") }
+  var dateError by remember { mutableStateOf(false) }
+
   if (showDatePicker) {
     DatePickerDialog(
       context,
       { _, year, month, day ->
-        onDateSelected(LocalDate.of(year, month + 1, day))
+        val selected = LocalDate.of(year, month + 1, day)
+        val age = Period.between(selected, LocalDate.now()).years
+        if (age < 18) {
+          dateError = true
+        } else {
+          onDateSelected(selected)
+          dateText = selected.format(dateFormatter)
+          dateError = false
+        }
         showDatePicker = false
       },
       birthDate?.year ?: LocalDate.now().year,
@@ -157,9 +171,29 @@ private fun AddCandidateContent(
       )
 
       OutlinedTextField(
-        value = birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "",
-        onValueChange = {},
-        label = { Text("Sélectionner une date") },
+        value = dateText,
+        onValueChange = {
+          dateText = it
+          if (it.isBlank()) {
+            dateError = false
+          } else {
+            try {
+              val parsed = LocalDate.parse(it, dateFormatter)
+              val age = Period.between(parsed, LocalDate.now()).years
+              if (age < 18) {
+                dateError = true
+              } else {
+                dateError = false
+                onDateSelected(parsed)
+              }
+            } catch (_: Exception) {
+              dateError = true
+            }
+          }
+        },
+        label = { Text("Date de naissance") },
+        placeholder = { Text("jj/MM/aaaa") },
+        isError = dateError,
         leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
         trailingIcon = {
           Icon(
@@ -168,8 +202,11 @@ private fun AddCandidateContent(
             modifier = Modifier.clickable { showDatePicker = true }
           )
         },
-        readOnly = true,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        supportingText = {
+          if (dateError) Text("Date invalide ou candidat doit avoir au moins 18 ans (jj/MM/aaaa)")
+        }
       )
 
       OutlinedTextField(
