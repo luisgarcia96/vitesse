@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,12 +42,16 @@ fun AddCandidateScreen(
     phoneNumber = state.phoneNumber,
     email = state.email,
     birthDate = state.birthDate,
+    expectedSalary = state.expectedSalary,
+    notes = state.notes,
     onBack = onBack,
     onFirstNameChanged = { viewModel.onEvent(AddCandidateEvent.SetFirstName(it)) },
     onLastNameChanged = { viewModel.onEvent(AddCandidateEvent.SetLastName(it)) },
     onPhoneChanged = { viewModel.onEvent(AddCandidateEvent.SetPhoneNumber(it)) },
     onEmailChanged = { viewModel.onEvent(AddCandidateEvent.SetEmail(it)) },
     onDateSelected = { viewModel.onEvent(AddCandidateEvent.SetBirthDate(it)) },
+    onExpectedSalaryChanged = { viewModel.onEvent(AddCandidateEvent.SetExpectedSalary(it)) },
+    onNotesChanged = { viewModel.onEvent(AddCandidateEvent.SetNotes(it)) },
     onSave = { viewModel.onEvent(AddCandidateEvent.SaveCandidate) }
   )
 }
@@ -59,12 +64,16 @@ private fun AddCandidateContent(
   phoneNumber: String,
   email: String,
   birthDate: LocalDate?,
+  expectedSalary: String,
+  notes: String,
   onBack: () -> Unit,
   onFirstNameChanged: (String) -> Unit,
   onLastNameChanged: (String) -> Unit,
   onPhoneChanged: (String) -> Unit,
   onEmailChanged: (String) -> Unit,
   onDateSelected: (LocalDate) -> Unit,
+  onExpectedSalaryChanged: (String) -> Unit,
+  onNotesChanged: (String) -> Unit,
   onSave: () -> Unit
 ) {
   val context = LocalContext.current
@@ -163,6 +172,26 @@ private fun AddCandidateContent(
         modifier = Modifier.fillMaxWidth()
       )
 
+      OutlinedTextField(
+        value = expectedSalary,
+        onValueChange = onExpectedSalaryChanged,
+        label = { Text("Salaire attendu") },
+        leadingIcon = { Icon(Icons.Default.AttachMoney, contentDescription = null) },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+      )
+
+      OutlinedTextField(
+        value = notes,
+        onValueChange = onNotesChanged,
+        label = { Text("Notes") },
+        leadingIcon = { Icon(Icons.AutoMirrored.Filled.Notes, contentDescription = null) },
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(120.dp),
+        maxLines = 5
+      )
+
       Button(
         onClick = onSave,
         modifier = Modifier.fillMaxWidth()
@@ -182,12 +211,16 @@ private fun AddCandidate_Empty_Preview() {
     phoneNumber = "",
     email = "",
     birthDate = null,
+    expectedSalary = "",
+    notes = "",
     onBack = {},
     onFirstNameChanged = {},
     onLastNameChanged = {},
     onPhoneChanged = {},
     onEmailChanged = {},
     onDateSelected = {},
+    onExpectedSalaryChanged = {},
+    onNotesChanged = {},
     onSave = {}
   )
 }
@@ -201,12 +234,16 @@ private fun AddCandidate_Filled_Preview() {
     phoneNumber = "+33 6 12 34 56 78",
     email = "ada@example.com",
     birthDate = LocalDate.of(1815, 12, 10),
+    expectedSalary = "85000",
+    notes = "Pioneer in computing",
     onBack = {},
     onFirstNameChanged = {},
     onLastNameChanged = {},
     onPhoneChanged = {},
     onEmailChanged = {},
     onDateSelected = {},
+    onExpectedSalaryChanged = {},
+    onNotesChanged = {},
     onSave = {}
   )
 }
