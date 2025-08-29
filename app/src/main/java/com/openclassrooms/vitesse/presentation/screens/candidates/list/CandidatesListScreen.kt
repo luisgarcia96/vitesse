@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.openclassrooms.vitesse.data.dao.CandidateDao
 
@@ -28,6 +29,19 @@ fun CandidatesListScreen(
   // collect the Flow from your DAO
   val candidates by dao.getAllCandidates().collectAsState(initial = emptyList())
 
+  val displayNames = candidates.map { "${it.firstName} ${it.lastName}" }
+  CandidatesListContent(
+    displayNames = displayNames,
+    onAddCandidate = onAddCandidate
+  )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CandidatesListContent(
+  displayNames: List<String>,
+  onAddCandidate: () -> Unit
+) {
   Scaffold(
     topBar = {
       TopAppBar(title = { Text("Liste des candidats") })
@@ -38,7 +52,7 @@ fun CandidatesListScreen(
       }
     }
   ) { paddingValues ->
-    if (candidates.isEmpty()) {
+    if (displayNames.isEmpty()) {
       Box(
         modifier = Modifier
           .padding(paddingValues)
@@ -52,10 +66,28 @@ fun CandidatesListScreen(
         modifier = Modifier.padding(paddingValues),
         contentPadding = PaddingValues(16.dp)
       ) {
-        items(candidates) { candidate ->
-          Text("${candidate.firstName} ${candidate.lastName}")
+        items(displayNames) { name ->
+          Text(name)
         }
       }
     }
   }
+}
+
+@Preview(showBackground = true, name = "Empty state")
+@Composable
+private fun CandidatesList_Empty_Preview() {
+  CandidatesListContent(
+    displayNames = emptyList(),
+    onAddCandidate = {}
+  )
+}
+
+@Preview(showBackground = true, name = "With items")
+@Composable
+private fun CandidatesList_WithItems_Preview() {
+  CandidatesListContent(
+    displayNames = listOf("Ada Lovelace", "Alan Turing", "Grace Hopper"),
+    onAddCandidate = {}
+  )
 }
