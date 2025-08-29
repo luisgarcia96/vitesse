@@ -13,4 +13,6 @@
     <string name="notes">Notes</string>
     <string name="add">Ajouter</string>
     <string name="add_candidate">Ajouter un candidat</string>
+    <string name="no_candidate">Aucun candidat</string>
+    <string name="search_candidate">Rechercher un candidat</string>
 </resources>

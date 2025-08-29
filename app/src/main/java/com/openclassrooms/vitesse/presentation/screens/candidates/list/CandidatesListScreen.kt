@@ -26,9 +26,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.openclassrooms.vitesse.R
 import com.openclassrooms.vitesse.data.dao.CandidateDao
 
 private data class CandidateUi(
@@ -65,11 +67,11 @@ private fun CandidatesListContent(
 ) {
   Scaffold(
     topBar = {
-      TopAppBar(title = { Text("Liste des candidats") })
+      TopAppBar(title = { Text(stringResource(R.string.search_candidate))})
     },
     floatingActionButton = {
       Button(onClick = onAddCandidate) {
-        Text("Ajouter")
+        Text(stringResource(R.string.add))
       }
     }
   ) { paddingValues ->
@@ -80,7 +82,7 @@ private fun CandidatesListContent(
           .fillMaxSize(),
         contentAlignment = Alignment.Center
       ) {
-        Text("Aucun candidat")
+        Text(stringResource(R.string.no_candidate))
       }
     } else {
       LazyColumn(
