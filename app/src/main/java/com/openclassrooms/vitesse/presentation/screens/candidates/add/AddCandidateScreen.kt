@@ -120,10 +120,10 @@ private fun AddCandidateContent(
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text("Ajouter un candidat") },
+        title = { Text(stringResource(R.string.add_candidate)) },
         navigationIcon = {
           IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
           }
         }
       )
@@ -153,7 +153,7 @@ private fun AddCandidateContent(
           onFirstNameChanged(it)
           if (firstNameError && it.isNotBlank()) firstNameError = false
         },
-        label = { Text("Prénom") },
+        label = { Text(stringResource(R.string.first_name)) },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
         isError = firstNameError,
@@ -166,7 +166,7 @@ private fun AddCandidateContent(
           onLastNameChanged(it)
           if (lastNameError && it.isNotBlank()) lastNameError = false
         },
-        label = { Text("Nom") },
+        label = { Text(stringResource(R.string.last_name)) },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
         isError = lastNameError,
@@ -179,7 +179,7 @@ private fun AddCandidateContent(
           onPhoneChanged(it)
           if (phoneError && it.isNotBlank()) phoneError = false
         },
-        label = { Text("Phone") },
+        label = { Text(stringResource(R.string.phone_number)) },
         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -194,7 +194,7 @@ private fun AddCandidateContent(
           if (emailEmptyError && it.isNotBlank()) emailEmptyError = false
           if (emailFormatError) emailFormatError = false
         },
-        label = { Text("Email") },
+        label = { Text(stringResource(R.string.email)) },
         leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -229,7 +229,7 @@ private fun AddCandidateContent(
             }
           }
         },
-        label = { Text("Date de naissance") },
+        label = { Text(stringResource(R.string.birth_date)) },
         placeholder = { Text("jj/MM/aaaa") },
         isError = dateError || birthDateRequiredError,
         leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
@@ -253,7 +253,7 @@ private fun AddCandidateContent(
       OutlinedTextField(
         value = expectedSalary,
         onValueChange = onExpectedSalaryChanged,
-        label = { Text("Salaire attendu") },
+        label = { Text(stringResource(R.string.expected_salary)) },
         leadingIcon = { Icon(Icons.Default.AttachMoney, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -262,7 +262,7 @@ private fun AddCandidateContent(
       OutlinedTextField(
         value = notes,
         onValueChange = onNotesChanged,
-        label = { Text("Notes") },
+        label = { Text(stringResource(R.string.notes)) },
         leadingIcon = { Icon(Icons.AutoMirrored.Filled.Notes, contentDescription = null) },
         modifier = Modifier
           .fillMaxWidth()
@@ -288,7 +288,7 @@ private fun AddCandidateContent(
         },
         modifier = Modifier.fillMaxWidth()
       ) {
-        Text("Sauvegarder")
+        Text(stringResource(R.string.save))
       }
     }
   }
