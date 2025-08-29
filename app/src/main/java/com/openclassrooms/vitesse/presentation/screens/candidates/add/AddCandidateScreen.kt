@@ -24,6 +24,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.Period
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
+import com.openclassrooms.vitesse.R
+import android.util.Patterns
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,6 +88,13 @@ private fun AddCandidateContent(
   var dateText by remember { mutableStateOf(birthDate?.format(dateFormatter) ?: "") }
   var dateError by remember { mutableStateOf(false) }
 
+  var firstNameError by remember { mutableStateOf(false) }
+  var lastNameError by remember { mutableStateOf(false) }
+  var phoneError by remember { mutableStateOf(false) }
+  var emailEmptyError by remember { mutableStateOf(false) }
+  var emailFormatError by remember { mutableStateOf(false) }
+  var birthDateRequiredError by remember { mutableStateOf(false) }
+
   if (showDatePicker) {
     DatePickerDialog(
       context,
@@ -97,6 +107,7 @@ private fun AddCandidateContent(
           onDateSelected(selected)
           dateText = selected.format(dateFormatter)
           dateError = false
+          birthDateRequiredError = false
         }
         showDatePicker = false
       },
@@ -138,42 +149,69 @@ private fun AddCandidateContent(
 
       OutlinedTextField(
         value = firstName,
-        onValueChange = onFirstNameChanged,
+        onValueChange = {
+          onFirstNameChanged(it)
+          if (firstNameError && it.isNotBlank()) firstNameError = false
+        },
         label = { Text("Prénom") },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        isError = firstNameError,
+        supportingText = { if (firstNameError) Text(stringResource(R.string.error_mandatory)) }
       )
 
       OutlinedTextField(
         value = lastName,
-        onValueChange = onLastNameChanged,
+        onValueChange = {
+          onLastNameChanged(it)
+          if (lastNameError && it.isNotBlank()) lastNameError = false
+        },
         label = { Text("Nom") },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        isError = lastNameError,
+        supportingText = { if (lastNameError) Text(stringResource(R.string.error_mandatory)) }
       )
 
       OutlinedTextField(
         value = phoneNumber,
-        onValueChange = onPhoneChanged,
+        onValueChange = {
+          onPhoneChanged(it)
+          if (phoneError && it.isNotBlank()) phoneError = false
+        },
         label = { Text("Phone") },
         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+        isError = phoneError,
+        supportingText = { if (phoneError) Text(stringResource(R.string.error_mandatory)) }
       )
 
       OutlinedTextField(
         value = email,
-        onValueChange = onEmailChanged,
+        onValueChange = {
+          onEmailChanged(it)
+          if (emailEmptyError && it.isNotBlank()) emailEmptyError = false
+          if (emailFormatError) emailFormatError = false
+        },
         label = { Text("Email") },
         leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        isError = emailEmptyError || emailFormatError,
+        supportingText = {
+          when {
+            emailEmptyError -> Text(stringResource(R.string.error_mandatory))
+            emailFormatError -> Text(stringResource(R.string.error_invalid_format))
+          }
+        }
       )
 
       OutlinedTextField(
         value = dateText,
         onValueChange = {
           dateText = it
+          birthDateRequiredError = false
           if (it.isBlank()) {
             dateError = false
           } else {
@@ -193,7 +231,7 @@ private fun AddCandidateContent(
         },
         label = { Text("Date de naissance") },
         placeholder = { Text("jj/MM/aaaa") },
-        isError = dateError,
+        isError = dateError || birthDateRequiredError,
         leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
         trailingIcon = {
           Icon(
@@ -205,7 +243,10 @@ private fun AddCandidateContent(
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         supportingText = {
-          if (dateError) Text("Date invalide ou candidat doit avoir au moins 18 ans (jj/MM/aaaa)")
+          when {
+            birthDateRequiredError -> Text(stringResource(R.string.error_mandatory))
+            dateError -> Text("Date invalide ou candidat doit avoir au moins 18 ans (jj/MM/aaaa)")
+          }
         }
       )
 
@@ -230,7 +271,21 @@ private fun AddCandidateContent(
       )
 
       Button(
-        onClick = onSave,
+        onClick = {
+          // Required checks
+          firstNameError = firstName.isBlank()
+          lastNameError = lastName.isBlank()
+          phoneError = phoneNumber.isBlank()
+          emailEmptyError = email.isBlank()
+          emailFormatError = if (!emailEmptyError) !Patterns.EMAIL_ADDRESS.matcher(email).matches() else false
+          birthDateRequiredError = birthDate == null || dateText.isBlank()
+
+          val hasError = firstNameError || lastNameError || phoneError || emailEmptyError || emailFormatError || birthDateRequiredError || dateError
+
+          if (!hasError) {
+            onSave()
+          }
+        },
         modifier = Modifier.fillMaxWidth()
       ) {
         Text("Sauvegarder")
