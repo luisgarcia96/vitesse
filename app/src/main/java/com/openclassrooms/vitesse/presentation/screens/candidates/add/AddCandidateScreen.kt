@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import com.openclassrooms.vitesse.data.dao.CandidateDao
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +35,38 @@ fun AddCandidateScreen(
   // collect state directly
   val state by viewModel.state.collectAsState()
 
+  AddCandidateContent(
+    firstName = state.firstName,
+    lastName = state.lastName,
+    phoneNumber = state.phoneNumber,
+    email = state.email,
+    birthDate = state.birthDate,
+    onBack = onBack,
+    onFirstNameChanged = { viewModel.onEvent(AddCandidateEvent.SetFirstName(it)) },
+    onLastNameChanged = { viewModel.onEvent(AddCandidateEvent.SetLastName(it)) },
+    onPhoneChanged = { viewModel.onEvent(AddCandidateEvent.SetPhoneNumber(it)) },
+    onEmailChanged = { viewModel.onEvent(AddCandidateEvent.SetEmail(it)) },
+    onDateSelected = { viewModel.onEvent(AddCandidateEvent.SetBirthDate(it)) },
+    onSave = { viewModel.onEvent(AddCandidateEvent.SaveCandidate) }
+  )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddCandidateContent(
+  firstName: String,
+  lastName: String,
+  phoneNumber: String,
+  email: String,
+  birthDate: LocalDate?,
+  onBack: () -> Unit,
+  onFirstNameChanged: (String) -> Unit,
+  onLastNameChanged: (String) -> Unit,
+  onPhoneChanged: (String) -> Unit,
+  onEmailChanged: (String) -> Unit,
+  onDateSelected: (LocalDate) -> Unit,
+  onSave: () -> Unit
+) {
   val context = LocalContext.current
   var showDatePicker by remember { mutableStateOf(false) }
 
@@ -40,12 +74,12 @@ fun AddCandidateScreen(
     DatePickerDialog(
       context,
       { _, year, month, day ->
-        viewModel.onEvent(AddCandidateEvent.SetBirthDate(LocalDate.of(year, month + 1, day)))
+        onDateSelected(LocalDate.of(year, month + 1, day))
         showDatePicker = false
       },
-      state.birthDate?.year ?: LocalDate.now().year,
-      (state.birthDate?.monthValue?.minus(1)) ?: (LocalDate.now().monthValue - 1),
-      state.birthDate?.dayOfMonth ?: LocalDate.now().dayOfMonth
+      birthDate?.year ?: LocalDate.now().year,
+      (birthDate?.monthValue?.minus(1)) ?: (LocalDate.now().monthValue - 1),
+      birthDate?.dayOfMonth ?: LocalDate.now().dayOfMonth
     ).show()
   }
 
@@ -55,7 +89,7 @@ fun AddCandidateScreen(
         title = { Text("Ajouter un candidat") },
         navigationIcon = {
           IconButton(onClick = onBack) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
           }
         }
       )
@@ -80,24 +114,24 @@ fun AddCandidateScreen(
       }
 
       OutlinedTextField(
-        value = state.firstName,
-        onValueChange = { viewModel.onEvent(AddCandidateEvent.SetFirstName(it)) },
+        value = firstName,
+        onValueChange = onFirstNameChanged,
         label = { Text("Prénom") },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
         modifier = Modifier.fillMaxWidth()
       )
 
       OutlinedTextField(
-        value = state.lastName,
-        onValueChange = { viewModel.onEvent(AddCandidateEvent.SetLastName(it)) },
+        value = lastName,
+        onValueChange = onLastNameChanged,
         label = { Text("Nom") },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
         modifier = Modifier.fillMaxWidth()
       )
 
       OutlinedTextField(
-        value = state.phoneNumber,
-        onValueChange = { viewModel.onEvent(AddCandidateEvent.SetPhoneNumber(it)) },
+        value = phoneNumber,
+        onValueChange = onPhoneChanged,
         label = { Text("Phone") },
         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
@@ -105,8 +139,8 @@ fun AddCandidateScreen(
       )
 
       OutlinedTextField(
-        value = state.email,
-        onValueChange = { viewModel.onEvent(AddCandidateEvent.SetEmail(it)) },
+        value = email,
+        onValueChange = onEmailChanged,
         label = { Text("Email") },
         leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
@@ -114,7 +148,7 @@ fun AddCandidateScreen(
       )
 
       OutlinedTextField(
-        value = state.birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "",
+        value = birthDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) ?: "",
         onValueChange = {},
         label = { Text("Sélectionner une date") },
         leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null) },
@@ -130,11 +164,49 @@ fun AddCandidateScreen(
       )
 
       Button(
-        onClick = { viewModel.onEvent(AddCandidateEvent.SaveCandidate) },
+        onClick = onSave,
         modifier = Modifier.fillMaxWidth()
       ) {
         Text("Sauvegarder")
       }
     }
   }
+}
+
+@Preview(showBackground = true, name = "Add Candidate – Empty")
+@Composable
+private fun AddCandidate_Empty_Preview() {
+  AddCandidateContent(
+    firstName = "",
+    lastName = "",
+    phoneNumber = "",
+    email = "",
+    birthDate = null,
+    onBack = {},
+    onFirstNameChanged = {},
+    onLastNameChanged = {},
+    onPhoneChanged = {},
+    onEmailChanged = {},
+    onDateSelected = {},
+    onSave = {}
+  )
+}
+
+@Preview(showBackground = true, name = "Add Candidate – Filled")
+@Composable
+private fun AddCandidate_Filled_Preview() {
+  AddCandidateContent(
+    firstName = "Ada",
+    lastName = "Lovelace",
+    phoneNumber = "+33 6 12 34 56 78",
+    email = "ada@example.com",
+    birthDate = LocalDate.of(1815, 12, 10),
+    onBack = {},
+    onFirstNameChanged = {},
+    onLastNameChanged = {},
+    onPhoneChanged = {},
+    onEmailChanged = {},
+    onDateSelected = {},
+    onSave = {}
+  )
 }
