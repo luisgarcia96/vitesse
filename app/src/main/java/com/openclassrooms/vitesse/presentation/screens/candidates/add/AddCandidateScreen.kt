@@ -284,6 +284,7 @@ private fun AddCandidateContent(
 
           if (!hasError) {
             onSave()
+            onBack()
           }
         },
         modifier = Modifier.fillMaxWidth()
