@@ -2,7 +2,6 @@ package com.openclassrooms.vitesse.presentation.screens.candidates.details
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,11 +10,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,6 +36,8 @@ import com.openclassrooms.vitesse.R
 import com.openclassrooms.vitesse.data.dao.CandidateDao
 import com.openclassrooms.vitesse.presentation.screens.candidates.edit.EditCandidateViewModel
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.tooling.preview.Preview
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,25 +49,62 @@ fun DetailsCandidateScreen(
 ) {
   val viewModel = remember(candidateId) { EditCandidateViewModel(dao, candidateId) }
   val state by viewModel.state.collectAsState()
-  var showConfirm by remember { mutableStateOf(false) }
 
+  DetailsCandidateContent(
+    id = state.id,
+    firstName = state.firstName,
+    lastName = state.lastName,
+    phoneNumber = state.phoneNumber,
+    email = state.email,
+    birthDate = state.birthDate,
+    expectedSalary = state.expectedSalary,
+    notes = state.notes,
+    isFavorite = state.isFavorite,
+    onBack = onBack,
+    onEdit = onEdit,
+    onToggleFavorite = { fav -> viewModel.setFavorite(fav) },
+    onDeleteConfirmed = {
+      viewModel.deleteCandidate()
+      onBack()
+    }
+  )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DetailsCandidateContent(
+  id: Int,
+  firstName: String,
+  lastName: String,
+  phoneNumber: String,
+  email: String,
+  birthDate: LocalDate?,
+  expectedSalary: String,
+  notes: String,
+  isFavorite: Boolean,
+  onBack: () -> Unit,
+  onEdit: (Int) -> Unit,
+  onToggleFavorite: (Boolean) -> Unit,
+  onDeleteConfirmed: () -> Unit,
+) {
+  var showConfirm by remember { mutableStateOf(false) }
   val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
 
   Scaffold(
     topBar = {
-      CenterAlignedTopAppBar(
-        title = { Text("${state.firstName} ${state.lastName}".trim(), maxLines = 1) },
+      TopAppBar(
+        title = { Text("$firstName $lastName".trim(), maxLines = 1) },
         navigationIcon = {
           IconButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
           }
         },
         actions = {
-          IconButton(onClick = { viewModel.setFavorite(!state.isFavorite) }) {
-            val icon = if (state.isFavorite) Icons.Filled.Star else Icons.Outlined.Star
+          IconButton(onClick = { onToggleFavorite(!isFavorite) }) {
+            val icon = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline
             Icon(icon, contentDescription = null)
           }
-          IconButton(onClick = { onEdit(state.id) }) {
+          IconButton(onClick = { onEdit(id) }) {
             Icon(Icons.Filled.Edit, contentDescription = null)
           }
           IconButton(onClick = { showConfirm = true }) {
@@ -86,35 +124,35 @@ fun DetailsCandidateScreen(
       Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
           Text(text = stringResource(R.string.first_name), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = state.firstName, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
+          Text(text = firstName, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
           Text(text = stringResource(R.string.last_name), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = state.lastName, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
+          Text(text = lastName, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
         }
       }
 
       Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
           Text(text = stringResource(R.string.phone_number), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = state.phoneNumber)
+          Text(text = phoneNumber)
           Text(text = stringResource(R.string.email), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = state.email)
+          Text(text = email)
         }
       }
 
       Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
           Text(text = stringResource(R.string.birth_date), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = state.birthDate?.format(dateFormatter) ?: "")
+          Text(text = birthDate?.format(dateFormatter) ?: "")
           Text(text = stringResource(R.string.expected_salary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = state.expectedSalary)
+          Text(text = expectedSalary)
         }
       }
 
-      if (state.notes.isNotBlank()) {
+      if (notes.isNotBlank()) {
         Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
           Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(text = stringResource(R.string.notes), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-            Text(text = state.notes)
+            Text(text = notes)
           }
         }
       }
@@ -129,8 +167,7 @@ fun DetailsCandidateScreen(
       confirmButton = {
         TextButton(onClick = {
           showConfirm = false
-          viewModel.deleteCandidate()
-          onBack()
+          onDeleteConfirmed()
         }) { Text(stringResource(R.string.confirm)) }
       },
       dismissButton = {
@@ -140,3 +177,22 @@ fun DetailsCandidateScreen(
   }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun DetailsCandidateScreen_Preview() {
+  DetailsCandidateContent(
+    id = 1,
+    firstName = "Ada",
+    lastName = "Lovelace",
+    phoneNumber = "06 12 34 56 78",
+    email = "ada@example.com",
+    birthDate = LocalDate.of(1815, 12, 10),
+    expectedSalary = "€55,000",
+    notes = "Excels at algorithms. Available from October.",
+    isFavorite = false,
+    onBack = {},
+    onEdit = {},
+    onToggleFavorite = {},
+    onDeleteConfirmed = {}
+  )
+}
