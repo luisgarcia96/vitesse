@@ -13,8 +13,14 @@
     <string name="notes">Notes</string>
     <string name="add">Ajouter</string>
     <string name="add_candidate">Ajouter un candidat</string>
+    <string name="edit_candidate">Modifier un candidat</string>
     <string name="no_candidate">Aucun candidat</string>
     <string name="search_candidate">Rechercher un candidat</string>
     <string name="all">Tous</string>
     <string name="favorites">Favoris</string>
+    <string name="delete">Supprimer</string>
+    <string name="confirm">Confirmer</string>
+    <string name="cancel">Annuler</string>
+    <string name="confirm_delete_title">Supprimer le candidat ?</string>
+    <string name="confirm_delete_message">Cette action est irréversible.</string>
 </resources>

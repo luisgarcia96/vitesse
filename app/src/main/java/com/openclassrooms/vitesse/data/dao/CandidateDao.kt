@@ -17,8 +17,8 @@ interface CandidateDao {
   fun getAllCandidates(): Flow<List<Candidate>> //Add suspend later
 
   @Query("SELECT * FROM candidate WHERE id = :id")
-  fun getCandidateById(id: Int): Candidate? //Add suspend later
+  suspend fun getCandidateById(id: Int): Candidate? //Add suspend later
 
   @Delete
-  fun deleteCandidate(candidate: Candidate) //Add suspend later
+  suspend fun deleteCandidate(candidate: Candidate) //Add suspend later
 }

@@ -1,6 +1,7 @@
 package com.openclassrooms.vitesse.presentation.screens.candidates.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,6 +45,7 @@ import com.openclassrooms.vitesse.R
 import com.openclassrooms.vitesse.data.dao.CandidateDao
 
 private data class CandidateUi(
+  val id: Int,
   val firstName: String,
   val lastName: String,
   val notes: String?
@@ -53,19 +55,22 @@ private data class CandidateUi(
 @Composable
 fun CandidatesListScreen(
   dao: CandidateDao,
-  onAddCandidate: () -> Unit
+  onAddCandidate: () -> Unit,
+  onOpenCandidate: (Int) -> Unit
 ) {
   // collect the Flow from your DAO
   val candidates by dao.getAllCandidates().collectAsState(initial = emptyList())
 
   val uiCandidates = candidates.map { CandidateUi(
+    id = it.id,
     firstName = it.firstName,
     lastName = it.lastName,
     notes = it.notes
   ) }
   CandidatesListContent(
     candidates = uiCandidates,
-    onAddCandidate = onAddCandidate
+    onAddCandidate = onAddCandidate,
+    onOpenCandidate = onOpenCandidate
   )
 }
 
@@ -73,7 +78,8 @@ fun CandidatesListScreen(
 @Composable
 private fun CandidatesListContent(
   candidates: List<CandidateUi>,
-  onAddCandidate: () -> Unit
+  onAddCandidate: () -> Unit,
+  onOpenCandidate: (Int) -> Unit
 ) {
   var query by rememberSaveable { mutableStateOf("") }
   var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
@@ -147,7 +153,7 @@ private fun CandidatesListContent(
         contentPadding = PaddingValues(16.dp)
       ) {
         items(filtered) { candidate ->
-          CandidateItem(candidate = candidate)
+          CandidateItem(candidate = candidate, onClick = { onOpenCandidate(candidate.id) })
         }
       }
     }
@@ -157,12 +163,14 @@ private fun CandidatesListContent(
 @Composable
 private fun CandidateItem(
   candidate: CandidateUi,
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  onClick: () -> Unit = {}
 ) {
   Row(
     modifier = modifier
       .fillMaxWidth()
-      .padding(vertical = 8.dp),
+      .padding(vertical = 8.dp)
+      .clickable { onClick() },
     verticalAlignment = Alignment.CenterVertically
   ) {
     // Simple circular avatar with initials
@@ -204,7 +212,8 @@ private fun CandidateItem(
 private fun CandidatesList_Empty_Preview() {
   CandidatesListContent(
     candidates = emptyList(),
-    onAddCandidate = {}
+    onAddCandidate = {},
+    onOpenCandidate = {}
   )
 }
 
@@ -213,10 +222,11 @@ private fun CandidatesList_Empty_Preview() {
 private fun CandidatesList_WithItems_Preview() {
   CandidatesListContent(
     candidates = listOf(
-      CandidateUi("Ada", "Lovelace", "Math pioneer"),
-      CandidateUi("Alan", "Turing", "Father of AI"),
-      CandidateUi("Grace", "Hopper", "Long description here so it can be truncated at the second line blablabla boiznzefu kjherz zoz zn'")
+      CandidateUi(1, "Ada", "Lovelace", "Math pioneer"),
+      CandidateUi(2, "Alan", "Turing", "Father of AI"),
+      CandidateUi(3, "Grace", "Hopper", "Long description here so it can be truncated at the second line blablabla boiznzefu kjherz zoz zn'")
     ),
-    onAddCandidate = {}
+    onAddCandidate = {},
+    onOpenCandidate = {}
   )
 }

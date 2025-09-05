@@ -62,7 +62,8 @@ fun AddCandidateScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddCandidateContent(
+fun AddCandidateContent(
+  titleResId: Int = R.string.add_candidate,
   firstName: String,
   lastName: String,
   phoneNumber: String,
@@ -78,7 +79,8 @@ private fun AddCandidateContent(
   onDateSelected: (LocalDate) -> Unit,
   onExpectedSalaryChanged: (String) -> Unit,
   onNotesChanged: (String) -> Unit,
-  onSave: () -> Unit
+  onSave: () -> Unit,
+  bottomContent: (@Composable () -> Unit)? = null
 ) {
   val context = LocalContext.current
   var showDatePicker by remember { mutableStateOf(false) }
@@ -120,7 +122,7 @@ private fun AddCandidateContent(
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text(stringResource(R.string.add_candidate)) },
+        title = { Text(stringResource(titleResId)) },
         navigationIcon = {
           IconButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -291,6 +293,11 @@ private fun AddCandidateContent(
       ) {
         Text(stringResource(R.string.save))
       }
+
+      if (bottomContent != null) {
+        Spacer(Modifier.height(8.dp))
+        bottomContent()
+      }
     }
   }
 }
@@ -299,6 +306,7 @@ private fun AddCandidateContent(
 @Composable
 private fun AddCandidate_Empty_Preview() {
   AddCandidateContent(
+    titleResId = R.string.add_candidate,
     firstName = "",
     lastName = "",
     phoneNumber = "",
@@ -314,7 +322,8 @@ private fun AddCandidate_Empty_Preview() {
     onDateSelected = {},
     onExpectedSalaryChanged = {},
     onNotesChanged = {},
-    onSave = {}
+    onSave = {},
+    bottomContent = null
   )
 }
 
@@ -322,6 +331,7 @@ private fun AddCandidate_Empty_Preview() {
 @Composable
 private fun AddCandidate_Filled_Preview() {
   AddCandidateContent(
+    titleResId = R.string.add_candidate,
     firstName = "Ada",
     lastName = "Lovelace",
     phoneNumber = "+33 6 12 34 56 78",
@@ -337,6 +347,7 @@ private fun AddCandidate_Filled_Preview() {
     onDateSelected = {},
     onExpectedSalaryChanged = {},
     onNotesChanged = {},
-    onSave = {}
+    onSave = {},
+    bottomContent = null
   )
 }

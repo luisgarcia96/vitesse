@@ -12,8 +12,14 @@
     <string name="notes">Notes</string>
     <string name="add">Add</string>
     <string name="add_candidate">Add candidate</string>
+    <string name="edit_candidate">Edit candidate</string>
     <string name="no_candidate">No candidate</string>
     <string name="search_candidate">Search candidate</string>
     <string name="all">All</string>
     <string name="favorites">Favorites</string>
+    <string name="delete">Delete</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm_delete_title">Delete candidate?</string>
+    <string name="confirm_delete_message">This action cannot be undone.</string>
 </resources>
