@@ -15,5 +15,6 @@ data class Candidate(
   val email: String,
   val birthDate: LocalDate,
   val expectedSalary: Int,
-  val notes: String
+  val notes: String,
+  val isFavorite: Boolean = false
 )

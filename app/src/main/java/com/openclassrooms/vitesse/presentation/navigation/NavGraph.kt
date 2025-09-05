@@ -10,11 +10,13 @@ import com.openclassrooms.vitesse.data.dao.CandidateDao
 import com.openclassrooms.vitesse.presentation.screens.candidates.add.AddCandidateScreen
 import com.openclassrooms.vitesse.presentation.screens.candidates.list.CandidatesListScreen
 import com.openclassrooms.vitesse.presentation.screens.candidates.edit.EditCandidateScreen
+import com.openclassrooms.vitesse.presentation.screens.candidates.details.DetailsCandidateScreen
 
 object CandidateRoutes {
   const val LIST = "candidates_list"
   const val ADD  = "add_candidate"
   const val EDIT = "edit_candidate"
+  const val DETAILS = "candidate_details"
 }
 
 @Composable
@@ -32,7 +34,7 @@ fun AppNavGraph(
           navController.navigate(CandidateRoutes.ADD)
         },
         onOpenCandidate = { id ->
-          navController.navigate("${CandidateRoutes.EDIT}/$id")
+          navController.navigate("${CandidateRoutes.DETAILS}/$id")
         }
       )
     }
@@ -42,6 +44,19 @@ fun AppNavGraph(
         onBack = { navController.popBackStack() }
       )
     }
+    composable(
+      route = "${CandidateRoutes.DETAILS}/{id}",
+      arguments = listOf(navArgument("id") { type = NavType.IntType })
+    ) { backStackEntry ->
+      val id = backStackEntry.arguments?.getInt("id") ?: return@composable
+      DetailsCandidateScreen(
+        dao = candidateDao,
+        candidateId = id,
+        onBack = { navController.popBackStack() },
+        onEdit = { cid -> navController.navigate("${CandidateRoutes.EDIT}/$cid") }
+      )
+    }
+
     composable(
       route = "${CandidateRoutes.EDIT}/{id}",
       arguments = listOf(navArgument("id") { type = NavType.IntType })

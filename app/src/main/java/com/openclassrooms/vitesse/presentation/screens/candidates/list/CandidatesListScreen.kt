@@ -43,12 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
 import com.openclassrooms.vitesse.R
 import com.openclassrooms.vitesse.data.dao.CandidateDao
+ 
 
 private data class CandidateUi(
   val id: Int,
   val firstName: String,
   val lastName: String,
-  val notes: String?
+  val notes: String?,
+  val isFavorite: Boolean
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,15 +62,25 @@ fun CandidatesListScreen(
 ) {
   // collect the Flow from your DAO
   val candidates by dao.getAllCandidates().collectAsState(initial = emptyList())
+  val favorites by dao.getFavoriteCandidates().collectAsState(initial = emptyList())
 
   val uiCandidates = candidates.map { CandidateUi(
     id = it.id,
     firstName = it.firstName,
     lastName = it.lastName,
-    notes = it.notes
+    notes = it.notes,
+    isFavorite = it.isFavorite
+  ) }
+  val uiFavorites = favorites.map { CandidateUi(
+    id = it.id,
+    firstName = it.firstName,
+    lastName = it.lastName,
+    notes = it.notes,
+    isFavorite = it.isFavorite
   ) }
   CandidatesListContent(
     candidates = uiCandidates,
+    favorites = uiFavorites,
     onAddCandidate = onAddCandidate,
     onOpenCandidate = onOpenCandidate
   )
@@ -78,6 +90,7 @@ fun CandidatesListScreen(
 @Composable
 private fun CandidatesListContent(
   candidates: List<CandidateUi>,
+  favorites: List<CandidateUi>,
   onAddCandidate: () -> Unit,
   onOpenCandidate: (Int) -> Unit
 ) {
@@ -132,7 +145,7 @@ private fun CandidatesListContent(
       }
     }
   ) { paddingValues ->
-    val source = if (selectedTabIndex == 0) candidates else emptyList()
+    val source = if (selectedTabIndex == 0) candidates else favorites
     val filtered = if (query.isBlank()) source else source.filter { c ->
       "${c.firstName} ${c.lastName}".contains(query, ignoreCase = true) ||
       (c.notes?.contains(query, ignoreCase = true) == true)
@@ -153,7 +166,10 @@ private fun CandidatesListContent(
         contentPadding = PaddingValues(16.dp)
       ) {
         items(filtered) { candidate ->
-          CandidateItem(candidate = candidate, onClick = { onOpenCandidate(candidate.id) })
+          CandidateItem(
+            candidate = candidate,
+            onClick = { onOpenCandidate(candidate.id) }
+          )
         }
       }
     }
@@ -204,6 +220,7 @@ private fun CandidateItem(
         )
       }
     }
+
   }
 }
 
@@ -212,6 +229,7 @@ private fun CandidateItem(
 private fun CandidatesList_Empty_Preview() {
   CandidatesListContent(
     candidates = emptyList(),
+    favorites = emptyList(),
     onAddCandidate = {},
     onOpenCandidate = {}
   )
@@ -222,9 +240,12 @@ private fun CandidatesList_Empty_Preview() {
 private fun CandidatesList_WithItems_Preview() {
   CandidatesListContent(
     candidates = listOf(
-      CandidateUi(1, "Ada", "Lovelace", "Math pioneer"),
-      CandidateUi(2, "Alan", "Turing", "Father of AI"),
-      CandidateUi(3, "Grace", "Hopper", "Long description here so it can be truncated at the second line blablabla boiznzefu kjherz zoz zn'")
+      CandidateUi(1, "Ada", "Lovelace", "Math pioneer", true),
+      CandidateUi(2, "Alan", "Turing", "Father of AI", false),
+      CandidateUi(3, "Grace", "Hopper", "Long description here so it can be truncated at the second line blablabla boiznzefu kjherz zoz zn'", false)
+    ),
+    favorites = listOf(
+      CandidateUi(1, "Ada", "Lovelace", "Math pioneer", true)
     ),
     onAddCandidate = {},
     onOpenCandidate = {}

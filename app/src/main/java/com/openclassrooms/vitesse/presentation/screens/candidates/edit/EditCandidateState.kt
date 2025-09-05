@@ -10,6 +10,6 @@ data class EditCandidateState(
   val email: String = "",
   val birthDate: LocalDate? = null,
   val expectedSalary: String = "",
-  val notes: String = ""
+  val notes: String = "",
+  val isFavorite: Boolean = false
 )
-

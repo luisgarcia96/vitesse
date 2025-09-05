@@ -42,7 +42,8 @@ class AddCandidateViewModel(
           email = email,
           birthDate = birthDate,
           expectedSalary = expectedSalary.toIntOrNull() ?: 0,
-          notes = notes
+          notes = notes,
+          isFavorite = false
         )
 
         // Save candidate to database

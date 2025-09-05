@@ -32,7 +32,8 @@ class EditCandidateViewModel(
             email = candidate.email,
             birthDate = candidate.birthDate,
             expectedSalary = candidate.expectedSalary.toString(),
-            notes = candidate.notes
+            notes = candidate.notes,
+            isFavorite = candidate.isFavorite
           )
         }
       }
@@ -52,7 +53,8 @@ class EditCandidateViewModel(
           email = s.email,
           birthDate = s.birthDate ?: return,
           expectedSalary = s.expectedSalary.toIntOrNull() ?: 0,
-          notes = s.notes
+          notes = s.notes,
+          isFavorite = s.isFavorite
         )
         viewModelScope.launch {
           dao.upsertCandidate(candidate)
@@ -85,6 +87,15 @@ class EditCandidateViewModel(
     )
     viewModelScope.launch {
       dao.deleteCandidate(candidate)
+    }
+  }
+
+  fun setFavorite(isFavorite: Boolean) {
+    val id = _state.value.id
+    if (id == 0) return
+    viewModelScope.launch {
+      dao.setFavorite(id, isFavorite)
+      _state.update { it.copy(isFavorite = isFavorite) }
     }
   }
 }
