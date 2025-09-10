@@ -23,6 +23,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -110,15 +113,38 @@ private fun DetailsCandidateContent(
           }
         },
         actions = {
-          IconButton(onClick = { onToggleFavorite(!isFavorite) }) {
-            val icon = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline
-            Icon(icon, contentDescription = null)
+          val favTooltip = if (isFavorite) stringResource(R.string.remove_favorite) else stringResource(R.string.add_favorite)
+          val tooltipState = rememberTooltipState()
+          TooltipBox(
+            positionProvider = androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = { PlainTooltip { Text(favTooltip) } },
+            state = tooltipState,
+          ) {
+            IconButton(onClick = { onToggleFavorite(!isFavorite) }) {
+              val icon = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarOutline
+              Icon(icon, contentDescription = favTooltip)
+            }
           }
-          IconButton(onClick = { onEdit(id) }) {
-            Icon(Icons.Filled.Edit, contentDescription = null)
+          val editTooltip = stringResource(R.string.edit)
+          TooltipBox(
+            positionProvider = androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = { PlainTooltip { Text(editTooltip) } },
+            state = rememberTooltipState(),
+          ) {
+            IconButton(onClick = { onEdit(id) }) {
+              Icon(Icons.Filled.Edit, contentDescription = editTooltip)
+            }
           }
-          IconButton(onClick = { showConfirm = true }) {
-            Icon(Icons.Filled.Delete, contentDescription = null)
+
+          val deleteTooltip = stringResource(R.string.delete)
+          TooltipBox(
+            positionProvider = androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = { PlainTooltip { Text(deleteTooltip) } },
+            state = rememberTooltipState(),
+          ) {
+            IconButton(onClick = { showConfirm = true }) {
+              Icon(Icons.Filled.Delete, contentDescription = deleteTooltip)
+            }
           }
         }
       )

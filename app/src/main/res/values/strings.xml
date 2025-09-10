@@ -22,8 +22,11 @@
     <string name="all">All</string>
     <string name="favorites">Favorites</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="confirm_delete_title">Delete candidate?</string>
     <string name="confirm_delete_message">This action cannot be undone.</string>
+    <string name="add_favorite">Add to favorites</string>
+    <string name="remove_favorite">Remove from favorites</string>
 </resources>

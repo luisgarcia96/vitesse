@@ -23,8 +23,11 @@
     <string name="all">Tous</string>
     <string name="favorites">Favoris</string>
     <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
     <string name="confirm">Confirmer</string>
     <string name="cancel">Annuler</string>
     <string name="confirm_delete_title">Supprimer le candidat ?</string>
     <string name="confirm_delete_message">Cette action est irréversible.</string>
+    <string name="add_favorite">Ajouter aux favoris</string>
+    <string name="remove_favorite">Retirer des favoris</string>
 </resources>
