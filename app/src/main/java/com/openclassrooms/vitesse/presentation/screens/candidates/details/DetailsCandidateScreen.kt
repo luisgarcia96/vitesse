@@ -160,7 +160,7 @@ private fun DetailsCandidateContent(
       val context = LocalContext.current
 
       Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
       ) {
@@ -173,7 +173,7 @@ private fun DetailsCandidateContent(
               }
             },
             enabled = phoneNumber.isNotBlank(),
-            modifier = Modifier.size(56.dp)
+            modifier = Modifier.size(48.dp)
           ) {
             Icon(Icons.Filled.Call, contentDescription = stringResource(R.string.call))
           }
@@ -189,7 +189,7 @@ private fun DetailsCandidateContent(
               }
             },
             enabled = phoneNumber.isNotBlank(),
-            modifier = Modifier.size(56.dp)
+            modifier = Modifier.size(48.dp)
           ) {
             Icon(Icons.Filled.Sms, contentDescription = stringResource(R.string.sms))
           }
@@ -205,7 +205,7 @@ private fun DetailsCandidateContent(
               }
             },
             enabled = email.isNotBlank(),
-            modifier = Modifier.size(56.dp)
+            modifier = Modifier.size(48.dp)
           ) {
             Icon(Icons.Filled.Email, contentDescription = stringResource(R.string.email))
           }
@@ -215,21 +215,33 @@ private fun DetailsCandidateContent(
 
       // About card
       Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          Text(text = stringResource(R.string.about), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = stringResource(R.string.birth_date), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(42.dp)) {
           Text(
-            text = birthDate?.let {
-              val years = Period.between(it, LocalDate.now()).years
-              "${it.format(dateFormatter)} (${years} ${stringResource(R.string.years)})"
-            } ?: ""
+            text = stringResource(R.string.about),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
           )
+          Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+          ) {
+            Text(
+              text = birthDate?.let {
+                val years = Period.between(it, LocalDate.now()).years
+                "${it.format(dateFormatter)} (${years} ${stringResource(R.string.years)})"
+              } ?: ""
+            )
+            Text(
+              text = stringResource(R.string.birth_date),
+              style = MaterialTheme.typography.labelMedium,
+              color = MaterialTheme.colorScheme.primary
+            )
+          }
         }
       }
 
       // Expected Salary card
       Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(42.dp)) {
           Text(text = stringResource(R.string.expected_salary), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
           Text(text = expectedSalary)
         }
@@ -238,7 +250,7 @@ private fun DetailsCandidateContent(
       // Notes card
       if (notes.isNotBlank()) {
         Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
-          Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(42.dp)) {
             Text(text = stringResource(R.string.notes), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Text(text = notes)
           }
