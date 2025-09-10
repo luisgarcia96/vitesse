@@ -11,6 +11,10 @@
     <string name="birth_date">Date de naissance</string>
     <string name="expected_salary">Salaire attendu</string>
     <string name="notes">Notes</string>
+    <string name="about">À propos</string>
+    <string name="call">Appeler</string>
+    <string name="sms">SMS</string>
+    <string name="years">ans</string>
     <string name="add">Ajouter</string>
     <string name="add_candidate">Ajouter un candidat</string>
     <string name="edit_candidate">Modifier un candidat</string>

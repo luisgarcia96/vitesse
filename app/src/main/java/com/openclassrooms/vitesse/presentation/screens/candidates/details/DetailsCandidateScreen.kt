@@ -2,14 +2,19 @@ package com.openclassrooms.vitesse.presentation.screens.candidates.details
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Sms
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -17,6 +22,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,8 +35,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.openclassrooms.vitesse.R
 import com.openclassrooms.vitesse.data.dao.CandidateDao
@@ -38,6 +44,10 @@ import com.openclassrooms.vitesse.presentation.screens.candidates.edit.EditCandi
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.tooling.preview.Preview
 import java.time.LocalDate
+import java.time.Period
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,37 +131,89 @@ private fun DetailsCandidateContent(
         .padding(16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-      Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          Text(text = stringResource(R.string.first_name), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = firstName, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
-          Text(text = stringResource(R.string.last_name), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = lastName, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
+      val context = LocalContext.current
+
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+          FilledIconButton(
+            onClick = {
+              if (phoneNumber.isNotBlank()) {
+                val intent = Intent(Intent.ACTION_DIAL, ("tel:" + phoneNumber).toUri())
+                context.startActivity(intent)
+              }
+            },
+            enabled = phoneNumber.isNotBlank(),
+            modifier = Modifier.size(56.dp)
+          ) {
+            Icon(Icons.Filled.Call, contentDescription = stringResource(R.string.call))
+          }
+          Text(text = stringResource(R.string.call), style = MaterialTheme.typography.labelMedium)
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+          FilledIconButton(
+            onClick = {
+              if (phoneNumber.isNotBlank()) {
+                val intent = Intent(Intent.ACTION_SENDTO, ("smsto:" + phoneNumber).toUri())
+                context.startActivity(intent)
+              }
+            },
+            enabled = phoneNumber.isNotBlank(),
+            modifier = Modifier.size(56.dp)
+          ) {
+            Icon(Icons.Filled.Sms, contentDescription = stringResource(R.string.sms))
+          }
+          Text(text = stringResource(R.string.sms), style = MaterialTheme.typography.labelMedium)
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+          FilledIconButton(
+            onClick = {
+              if (email.isNotBlank()) {
+                val intent = Intent(Intent.ACTION_SENDTO, ("mailto:" + email).toUri())
+                context.startActivity(intent)
+              }
+            },
+            enabled = email.isNotBlank(),
+            modifier = Modifier.size(56.dp)
+          ) {
+            Icon(Icons.Filled.Email, contentDescription = stringResource(R.string.email))
+          }
+          Text(text = stringResource(R.string.email), style = MaterialTheme.typography.labelMedium)
         }
       }
 
+      // About card
       Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          Text(text = stringResource(R.string.phone_number), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = phoneNumber)
-          Text(text = stringResource(R.string.email), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = email)
-        }
-      }
-
-      Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text(text = stringResource(R.string.about), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
           Text(text = stringResource(R.string.birth_date), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = birthDate?.format(dateFormatter) ?: "")
-          Text(text = stringResource(R.string.expected_salary), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+          Text(
+            text = birthDate?.let {
+              val years = Period.between(it, LocalDate.now()).years
+              "${it.format(dateFormatter)} (${years} ${stringResource(R.string.years)})"
+            } ?: ""
+          )
+        }
+      }
+
+      // Expected Salary card
+      Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text(text = stringResource(R.string.expected_salary), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
           Text(text = expectedSalary)
         }
       }
 
+      // Notes card
       if (notes.isNotBlank()) {
         Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
           Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(text = stringResource(R.string.notes), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+            Text(text = stringResource(R.string.notes), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Text(text = notes)
           }
         }
