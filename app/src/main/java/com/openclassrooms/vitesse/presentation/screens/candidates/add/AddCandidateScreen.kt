@@ -87,7 +87,11 @@ fun AddCandidateContent(
 
   val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
 
-  var dateText by remember { mutableStateOf(birthDate?.format(dateFormatter) ?: "") }
+  // Keep a local editable text, but sync it whenever birthDate param changes
+  var dateText by remember { mutableStateOf("") }
+  LaunchedEffect(birthDate) {
+    dateText = birthDate?.format(dateFormatter) ?: ""
+  }
   var dateError by remember { mutableStateOf(false) }
 
   var firstNameError by remember { mutableStateOf(false) }
