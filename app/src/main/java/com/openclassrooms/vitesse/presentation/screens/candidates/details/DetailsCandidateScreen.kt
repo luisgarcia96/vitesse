@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
@@ -49,8 +50,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import java.time.LocalDate
 import java.time.Period
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import android.content.Intent
 import androidx.core.net.toUri
+import com.openclassrooms.vitesse.data.network.CurrencyApi
+import kotlin.math.roundToInt
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -240,10 +246,51 @@ private fun DetailsCandidateContent(
       }
 
       // Expected Salary card
+      var gbpText by remember(expectedSalary) { mutableStateOf<String?>(null) }
+      var isConverting by remember(expectedSalary) { mutableStateOf(false) }
+      val eurFormatted = remember(expectedSalary) {
+        val eurInt = expectedSalary.toIntOrNull()
+        if (eurInt != null && eurInt > 0) {
+          val nf = NumberFormat.getIntegerInstance(Locale.getDefault())
+          "€" + nf.format(eurInt)
+        } else null
+      }
+
+      LaunchedEffect(expectedSalary) {
+        isConverting = true
+        val eur = expectedSalary.filter { it.isDigit() || it == '.' || it == ',' }
+          .replace(",", "")
+          .toDoubleOrNull()
+        if (eur != null && eur > 0) {
+          val rate = CurrencyApi.fetchEurToGbpRate()
+          if (rate != null) {
+            val gbp = (eur * rate).roundToInt()
+            val nf = NumberFormat.getIntegerInstance(Locale.getDefault())
+            gbpText = nf.format(gbp) + "\u00A3" // £ suffix to match example
+          } else {
+            gbpText = null
+          }
+        } else {
+          gbpText = null
+        }
+        isConverting = false
+      }
+
+      // Show a sample value in Preview so designers can see the layout
+      if (LocalInspectionMode.current && gbpText == null) {
+        val nf = NumberFormat.getIntegerInstance(Locale.getDefault())
+        gbpText = "\u00A3" + nf.format(3026)
+      }
       Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(42.dp)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
           Text(text = stringResource(R.string.expected_salary), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-          Text(text = expectedSalary)
+          Text(text = eurFormatted ?: ("€" + expectedSalary))
+          val secondaryText = when {
+            isConverting -> stringResource(R.string.or_label) + " " + stringResource(R.string.calculating)
+            gbpText != null -> stringResource(R.string.or_label) + " " + gbpText!!
+            else -> stringResource(R.string.or_label) + " " + stringResource(R.string.not_available)
+          }
+          Text(text = secondaryText, style = MaterialTheme.typography.labelMedium)
         }
       }
 
@@ -287,7 +334,7 @@ private fun DetailsCandidateScreen_Preview() {
     phoneNumber = "06 12 34 56 78",
     email = "ada@example.com",
     birthDate = LocalDate.of(1815, 12, 10),
-    expectedSalary = "€55,000",
+    expectedSalary = "20,000",
     notes = "Excels at algorithms. Available from October.",
     isFavorite = false,
     onBack = {},

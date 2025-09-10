@@ -30,4 +30,7 @@
     <string name="confirm_delete_message">Cette action est irréversible.</string>
     <string name="add_favorite">Ajouter aux favoris</string>
     <string name="remove_favorite">Retirer des favoris</string>
+    <string name="or_label">Ou</string>
+    <string name="calculating">Calcul…</string>
+    <string name="not_available">N/A</string>
 </resources>

@@ -29,4 +29,7 @@
     <string name="confirm_delete_message">This action cannot be undone.</string>
     <string name="add_favorite">Add to favorites</string>
     <string name="remove_favorite">Remove from favorites</string>
+    <string name="or_label">Or</string>
+    <string name="calculating">Calculating…</string>
+    <string name="not_available">N/A</string>
 </resources>
