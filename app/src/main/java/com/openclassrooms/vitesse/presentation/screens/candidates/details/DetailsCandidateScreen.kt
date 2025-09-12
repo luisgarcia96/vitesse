@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -57,6 +58,9 @@ import com.openclassrooms.vitesse.data.network.CurrencyApi
 import kotlin.math.roundToInt
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.openclassrooms.vitesse.util.deleteImageIfLocal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +75,7 @@ fun DetailsCandidateScreen(
 
   DetailsCandidateContent(
     id = state.id,
+    photoUri = state.photoUri,
     firstName = state.firstName,
     lastName = state.lastName,
     phoneNumber = state.phoneNumber,
@@ -93,6 +98,7 @@ fun DetailsCandidateScreen(
 @Composable
 private fun DetailsCandidateContent(
   id: Int,
+  photoUri: String?,
   firstName: String,
   lastName: String,
   phoneNumber: String,
@@ -164,6 +170,20 @@ private fun DetailsCandidateContent(
       verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
       val context = LocalContext.current
+
+      // Photo at top
+      if (!photoUri.isNullOrBlank()) {
+        Card(modifier = Modifier.fillMaxWidth()) {
+          AsyncImage(
+            model = photoUri,
+            contentDescription = stringResource(R.string.candidate_photo),
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(200.dp),
+            contentScale = ContentScale.Crop
+          )
+        }
+      }
 
       Row(
         modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp),
@@ -314,6 +334,8 @@ private fun DetailsCandidateContent(
       confirmButton = {
         TextButton(onClick = {
           showConfirm = false
+          // delete local photo file if stored internally
+          deleteImageIfLocal(photoUri)
           onDeleteConfirmed()
         }) { Text(stringResource(R.string.confirm)) }
       },
@@ -329,6 +351,7 @@ private fun DetailsCandidateContent(
 private fun DetailsCandidateScreen_Preview() {
   DetailsCandidateContent(
     id = 1,
+    photoUri = null,
     firstName = "Ada",
     lastName = "Lovelace",
     phoneNumber = "06 12 34 56 78",

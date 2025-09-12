@@ -33,4 +33,7 @@
     <string name="or_label">Ou</string>
     <string name="calculating">Calcul…</string>
     <string name="not_available">N/A</string>
+    <string name="add_photo">Ajouter une photo</string>
+    <string name="candidate_photo">Photo du candidat</string>
+    <string name="remove_photo">Supprimer la photo</string>
 </resources>

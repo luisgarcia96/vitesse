@@ -9,5 +9,6 @@ data class AddCandidateState(
   val email: String = "",
   val birthDate: LocalDate? = null,
   val expectedSalary: String = "",
-  val notes: String = ""
+  val notes: String = "",
+  val photoUri: String? = null
 )

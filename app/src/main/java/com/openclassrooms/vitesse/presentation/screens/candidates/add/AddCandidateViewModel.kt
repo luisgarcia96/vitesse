@@ -30,6 +30,7 @@ class AddCandidateViewModel(
         val birthDate = _state.value.birthDate
         val expectedSalary = _state.value.expectedSalary
         val notes = _state.value.notes
+        val photoUri = _state.value.photoUri
 
         if (firstName.isBlank() || lastName.isBlank() || phoneNumber.isBlank() || email.isBlank() || birthDate == null) {
           return
@@ -43,6 +44,7 @@ class AddCandidateViewModel(
           birthDate = birthDate,
           expectedSalary = expectedSalary.toIntOrNull() ?: 0,
           notes = notes,
+          photoUri = photoUri,
           isFavorite = false
         )
 
@@ -61,7 +63,8 @@ class AddCandidateViewModel(
             email = "",
             birthDate = null,
             expectedSalary = "",
-            notes = ""
+            notes = "",
+            photoUri = null
           )
         }
       }
@@ -112,6 +115,11 @@ class AddCandidateViewModel(
           it.copy(
             phoneNumber = event.phoneNumber
           )
+        }
+      }
+      is AddCandidateEvent.SetPhotoUri -> {
+        _state.update {
+          it.copy(photoUri = event.photoUri)
         }
       }
       AddCandidateEvent.hideDatePicker -> {}

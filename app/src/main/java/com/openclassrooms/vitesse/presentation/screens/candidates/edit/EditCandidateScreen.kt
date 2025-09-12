@@ -20,6 +20,7 @@ fun EditCandidateScreen(
 
   AddCandidateContent(
     titleResId = R.string.edit_candidate,
+    photoUri = state.photoUri,
     firstName = state.firstName,
     lastName = state.lastName,
     phoneNumber = state.phoneNumber,
@@ -28,6 +29,7 @@ fun EditCandidateScreen(
     expectedSalary = state.expectedSalary,
     notes = state.notes,
     onBack = onBack,
+    onPhotoSelected = { viewModel.onEvent(AddCandidateEvent.SetPhotoUri(it)) },
     onFirstNameChanged = { viewModel.onEvent(AddCandidateEvent.SetFirstName(it)) },
     onLastNameChanged = { viewModel.onEvent(AddCandidateEvent.SetLastName(it)) },
     onPhoneChanged = { viewModel.onEvent(AddCandidateEvent.SetPhoneNumber(it)) },

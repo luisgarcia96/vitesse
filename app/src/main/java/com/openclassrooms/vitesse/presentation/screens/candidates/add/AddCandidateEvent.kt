@@ -14,4 +14,5 @@ sealed interface AddCandidateEvent {
   data class SetBirthDate(val birthDate: LocalDate): AddCandidateEvent
   data class SetExpectedSalary(val expectedSalary: String): AddCandidateEvent
   data class SetNotes(val notes: String): AddCandidateEvent
+  data class SetPhotoUri(val photoUri: String?): AddCandidateEvent
 }

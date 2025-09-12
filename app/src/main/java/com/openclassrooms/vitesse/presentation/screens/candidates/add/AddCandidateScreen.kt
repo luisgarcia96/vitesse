@@ -27,6 +27,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.res.stringResource
 import com.openclassrooms.vitesse.R
 import android.util.Patterns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
+import com.openclassrooms.vitesse.util.persistImageToAppStorage
+import com.openclassrooms.vitesse.util.deleteImageIfLocal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +49,7 @@ fun AddCandidateScreen(
   val state by viewModel.state.collectAsState()
 
   AddCandidateContent(
+    photoUri = state.photoUri,
     firstName = state.firstName,
     lastName = state.lastName,
     phoneNumber = state.phoneNumber,
@@ -49,6 +58,7 @@ fun AddCandidateScreen(
     expectedSalary = state.expectedSalary,
     notes = state.notes,
     onBack = onBack,
+    onPhotoSelected = { viewModel.onEvent(AddCandidateEvent.SetPhotoUri(it)) },
     onFirstNameChanged = { viewModel.onEvent(AddCandidateEvent.SetFirstName(it)) },
     onLastNameChanged = { viewModel.onEvent(AddCandidateEvent.SetLastName(it)) },
     onPhoneChanged = { viewModel.onEvent(AddCandidateEvent.SetPhoneNumber(it)) },
@@ -64,6 +74,7 @@ fun AddCandidateScreen(
 @Composable
 fun AddCandidateContent(
   titleResId: Int = R.string.add_candidate,
+  photoUri: String?,
   firstName: String,
   lastName: String,
   phoneNumber: String,
@@ -72,6 +83,7 @@ fun AddCandidateContent(
   expectedSalary: String,
   notes: String,
   onBack: () -> Unit,
+  onPhotoSelected: (String?) -> Unit,
   onFirstNameChanged: (String) -> Unit,
   onLastNameChanged: (String) -> Unit,
   onPhoneChanged: (String) -> Unit,
@@ -143,14 +155,61 @@ fun AddCandidateContent(
         .verticalScroll(rememberScrollState()),
       verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+      val coroutineScope = rememberCoroutineScope()
+      val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+      ) { uri ->
+        if (uri == null) {
+          onPhotoSelected(null)
+        } else {
+          coroutineScope.launch {
+            val persisted = persistImageToAppStorage(context, uri, existing = photoUri)
+            onPhotoSelected(persisted)
+          }
+        }
+      }
+
       Box(
         modifier = Modifier
           .fillMaxWidth()
           .height(200.dp)
-          .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)),
+          .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+          .clickable {
+            photoPickerLauncher.launch(
+              PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+          },
         contentAlignment = Alignment.Center
       ) {
-        // TODO: image placeholder
+        if (photoUri.isNullOrBlank()) {
+          Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Default.AddAPhoto, contentDescription = null)
+            Text(text = stringResource(R.string.add_photo))
+          }
+        } else {
+          AsyncImage(
+            model = photoUri,
+            contentDescription = stringResource(R.string.candidate_photo),
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+          )
+          // Remove photo overlay button
+          TextButton(
+            onClick = {
+              coroutineScope.launch {
+                deleteImageIfLocal(photoUri)
+                onPhotoSelected(null)
+              }
+            },
+            modifier = Modifier
+              .align(Alignment.TopEnd)
+              .padding(8.dp)
+          ) {
+            Icon(Icons.Default.Delete, contentDescription = null)
+            Spacer(Modifier.width(4.dp))
+            Text(stringResource(R.string.remove_photo))
+          }
+        }
       }
 
       OutlinedTextField(
@@ -306,11 +365,14 @@ fun AddCandidateContent(
   }
 }
 
+// helpers moved to util/ImageUtils.kt
+
 @Preview(showBackground = true, name = "Add Candidate – Empty")
 @Composable
 private fun AddCandidate_Empty_Preview() {
   AddCandidateContent(
     titleResId = R.string.add_candidate,
+    photoUri = null,
     firstName = "",
     lastName = "",
     phoneNumber = "",
@@ -319,6 +381,7 @@ private fun AddCandidate_Empty_Preview() {
     expectedSalary = "",
     notes = "",
     onBack = {},
+    onPhotoSelected = {},
     onFirstNameChanged = {},
     onLastNameChanged = {},
     onPhoneChanged = {},
@@ -336,6 +399,7 @@ private fun AddCandidate_Empty_Preview() {
 private fun AddCandidate_Filled_Preview() {
   AddCandidateContent(
     titleResId = R.string.add_candidate,
+    photoUri = null,
     firstName = "Ada",
     lastName = "Lovelace",
     phoneNumber = "+33 6 12 34 56 78",
@@ -344,6 +408,7 @@ private fun AddCandidate_Filled_Preview() {
     expectedSalary = "85000",
     notes = "Pioneer in computing",
     onBack = {},
+    onPhotoSelected = {},
     onFirstNameChanged = {},
     onLastNameChanged = {},
     onPhoneChanged = {},

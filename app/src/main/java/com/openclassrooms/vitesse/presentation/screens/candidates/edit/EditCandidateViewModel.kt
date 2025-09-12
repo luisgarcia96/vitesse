@@ -33,7 +33,8 @@ class EditCandidateViewModel(
             birthDate = candidate.birthDate,
             expectedSalary = candidate.expectedSalary.toString(),
             notes = candidate.notes,
-            isFavorite = candidate.isFavorite
+            isFavorite = candidate.isFavorite,
+            photoUri = candidate.photoUri
           )
         }
       }
@@ -54,6 +55,7 @@ class EditCandidateViewModel(
           birthDate = s.birthDate ?: return,
           expectedSalary = s.expectedSalary.toIntOrNull() ?: 0,
           notes = s.notes,
+          photoUri = s.photoUri,
           isFavorite = s.isFavorite
         )
         viewModelScope.launch {
@@ -69,6 +71,7 @@ class EditCandidateViewModel(
       is AddCandidateEvent.SetPhoneNumber -> _state.update { it.copy(phoneNumber = event.phoneNumber) }
       AddCandidateEvent.hideDatePicker -> {}
       AddCandidateEvent.showDatePicker -> {}
+      is AddCandidateEvent.SetPhotoUri -> _state.update { it.copy(photoUri = event.photoUri) }
     }
   }
 
@@ -83,7 +86,8 @@ class EditCandidateViewModel(
       email = s.email,
       birthDate = s.birthDate ?: return,
       expectedSalary = s.expectedSalary.toIntOrNull() ?: 0,
-      notes = s.notes
+      notes = s.notes,
+      photoUri = s.photoUri
     )
     viewModelScope.launch {
       dao.deleteCandidate(candidate)
