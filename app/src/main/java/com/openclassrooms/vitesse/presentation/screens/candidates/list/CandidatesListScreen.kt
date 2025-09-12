@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.height
 import com.openclassrooms.vitesse.R
 import com.openclassrooms.vitesse.data.dao.CandidateDao
+import coil.compose.AsyncImage
  
 
 private data class CandidateUi(
@@ -50,7 +51,8 @@ private data class CandidateUi(
   val firstName: String,
   val lastName: String,
   val notes: String?,
-  val isFavorite: Boolean
+  val isFavorite: Boolean,
+  val photoUri: String?
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,14 +71,16 @@ fun CandidatesListScreen(
     firstName = it.firstName,
     lastName = it.lastName,
     notes = it.notes,
-    isFavorite = it.isFavorite
+    isFavorite = it.isFavorite,
+    photoUri = it.photoUri
   ) }
   val uiFavorites = favorites.map { CandidateUi(
     id = it.id,
     firstName = it.firstName,
     lastName = it.lastName,
     notes = it.notes,
-    isFavorite = it.isFavorite
+    isFavorite = it.isFavorite,
+    photoUri = it.photoUri
   ) }
   CandidatesListContent(
     candidates = uiCandidates,
@@ -189,19 +193,30 @@ private fun CandidateItem(
       .clickable { onClick() },
     verticalAlignment = Alignment.CenterVertically
   ) {
-    // Simple circular avatar with initials
+    // Circular avatar: photo if present, else initials
     val initials = "${candidate.firstName.firstOrNull()?.uppercaseChar() ?: '?'}${candidate.lastName.firstOrNull()?.uppercaseChar() ?: ""}"
-    Box(
-      modifier = Modifier
-        .size(48.dp)
-        .clip(CircleShape)
-        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
-      contentAlignment = Alignment.Center
-    ) {
-      Text(
-        text = initials,
-        style = MaterialTheme.typography.titleMedium
+    if (!candidate.photoUri.isNullOrBlank()) {
+      AsyncImage(
+        model = candidate.photoUri,
+        contentDescription = null,
+        modifier = Modifier
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
       )
+    } else {
+      Box(
+        modifier = Modifier
+          .size(48.dp)
+          .clip(CircleShape)
+          .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
+        contentAlignment = Alignment.Center
+      ) {
+        Text(
+          text = initials,
+          style = MaterialTheme.typography.titleMedium
+        )
+      }
     }
 
     Spacer(modifier = Modifier.width(12.dp))
@@ -240,12 +255,12 @@ private fun CandidatesList_Empty_Preview() {
 private fun CandidatesList_WithItems_Preview() {
   CandidatesListContent(
     candidates = listOf(
-      CandidateUi(1, "Ada", "Lovelace", "Math pioneer", true),
-      CandidateUi(2, "Alan", "Turing", "Father of AI", false),
-      CandidateUi(3, "Grace", "Hopper", "Long description here so it can be truncated at the second line blablabla boiznzefu kjherz zoz zn'", false)
+      CandidateUi(1, "Ada", "Lovelace", "Math pioneer", true, null),
+      CandidateUi(2, "Alan", "Turing", "Father of AI", false, null),
+      CandidateUi(3, "Grace", "Hopper", "Long description here so it can be truncated at the second line blablabla boiznzefu kjherz zoz zn'", false, null)
     ),
     favorites = listOf(
-      CandidateUi(1, "Ada", "Lovelace", "Math pioneer", true)
+      CandidateUi(1, "Ada", "Lovelace", "Math pioneer", true, null)
     ),
     onAddCandidate = {},
     onOpenCandidate = {}

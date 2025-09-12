@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import com.openclassrooms.vitesse.data.dao.CandidateDao
@@ -35,6 +36,9 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import com.openclassrooms.vitesse.util.persistImageToAppStorage
 import com.openclassrooms.vitesse.util.deleteImageIfLocal
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.foundation.text.KeyboardActions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,6 +100,7 @@ fun AddCandidateContent(
 ) {
   val context = LocalContext.current
   var showDatePicker by remember { mutableStateOf(false) }
+  val focusManager = LocalFocusManager.current
 
   val dateFormatter = remember { DateTimeFormatter.ofPattern("dd/MM/yyyy") }
 
@@ -221,6 +226,9 @@ fun AddCandidateContent(
         label = { Text(stringResource(R.string.first_name)) },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
         isError = firstNameError,
         supportingText = { if (firstNameError) Text(stringResource(R.string.error_mandatory)) }
       )
@@ -234,6 +242,9 @@ fun AddCandidateContent(
         label = { Text(stringResource(R.string.last_name)) },
         leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
         isError = lastNameError,
         supportingText = { if (lastNameError) Text(stringResource(R.string.error_mandatory)) }
       )
@@ -247,7 +258,9 @@ fun AddCandidateContent(
         label = { Text(stringResource(R.string.phone_number)) },
         leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
         isError = phoneError,
         supportingText = { if (phoneError) Text(stringResource(R.string.error_mandatory)) }
       )
@@ -262,7 +275,9 @@ fun AddCandidateContent(
         label = { Text(stringResource(R.string.email)) },
         leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
         isError = emailEmptyError || emailFormatError,
         supportingText = {
           when {
@@ -306,7 +321,9 @@ fun AddCandidateContent(
           )
         },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
         supportingText = {
           when {
             birthDateRequiredError -> Text(stringResource(R.string.error_mandatory))
@@ -321,7 +338,9 @@ fun AddCandidateContent(
         label = { Text(stringResource(R.string.expected_salary)) },
         leadingIcon = { Icon(Icons.Default.AttachMoney, contentDescription = null) },
         modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) })
       )
 
       OutlinedTextField(
@@ -332,7 +351,9 @@ fun AddCandidateContent(
         modifier = Modifier
           .fillMaxWidth()
           .height(120.dp),
-        maxLines = 5
+        maxLines = 5,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
       )
 
       Button(
