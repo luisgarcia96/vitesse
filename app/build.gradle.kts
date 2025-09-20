@@ -1,8 +1,13 @@
+import org.gradle.api.tasks.testing.Test
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.compose)
   id("com.google.devtools.ksp")
+  id("jacoco")
 }
 
 android {
@@ -34,6 +39,54 @@ android {
   }
   buildFeatures {
     compose = true
+  }
+}
+
+jacoco {
+  toolVersion = "0.8.12"
+}
+
+tasks.withType<Test> {
+  extensions.configure<JacocoTaskExtension> {
+    isIncludeNoLocationClasses = true
+    excludes = listOf("jdk.internal.*")
+  }
+}
+
+tasks.register<JacocoReport>("jacocoDebugReport") {
+  dependsOn("testDebugUnitTest")
+
+  val fileFilter = listOf(
+    "**/R.class",
+    "**/R$*.class",
+    "**/BuildConfig.*",
+    "**/Manifest*.*",
+    "**/*Test*.*",
+    "android/**/*.*"
+  )
+
+  val kotlinClasses = layout.buildDirectory.dir("tmp/kotlin-classes/debug")
+  val javaClasses = layout.buildDirectory.dir("intermediates/javac/debug/classes")
+
+  classDirectories.setFrom(
+    kotlinClasses.map { dir ->
+      fileTree(dir) {
+        setExcludes(fileFilter)
+      }
+    },
+    javaClasses.map { dir ->
+      fileTree(dir) {
+        setExcludes(fileFilter)
+      }
+    }
+  )
+
+  sourceDirectories.setFrom(files("src/main/java", "src/main/kotlin"))
+  executionData.setFrom(layout.buildDirectory.file("jacoco/testDebugUnitTest.exec"))
+
+  reports {
+    xml.required.set(true)
+    html.required.set(true)
   }
 }
 
