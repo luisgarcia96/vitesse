@@ -112,6 +112,7 @@ dependencies {
   implementation(libs.androidx.activity.compose)
   implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
   implementation ("androidx.compose.material:material-icons-extended:1.4.3")
+  implementation("com.google.android.material:material:1.12.0")
   implementation(platform(libs.androidx.compose.bom))
   implementation(libs.androidx.ui)
   implementation(libs.androidx.ui.graphics)
