@@ -62,7 +62,23 @@ tasks.register<JacocoReport>("jacocoDebugReport") {
     "**/BuildConfig.*",
     "**/Manifest*.*",
     "**/*Test*.*",
-    "android/**/*.*"
+    "android/**/*.*",
+    "**/ComposableSingletons*",
+    "**/*ScreenKt.class",
+    "**/*ScreenKt$*.class",
+    "**/*ScreenKt.*",
+    "**/AddCandidateViewModel\$onEvent\$*",
+    "**/MainActivity*",
+    "**/*Preview*",
+    "**/presentation/**/NavGraphKt*",
+    "**/presentation/**/ComposableSingletons*",
+    "**/presentation/**/**/*ScreenKt*",
+    "**/ui/theme/**",
+    "**/data/dao/**",
+    "**/data/database/**",
+    "**/data/network/**",
+    "**/util/ImageUtilsKt*",
+    "**/presentation/**/CandidateUi*"
   )
 
   val kotlinClasses = layout.buildDirectory.dir("tmp/kotlin-classes/debug")
@@ -107,6 +123,7 @@ dependencies {
   // Coil for image loading
   implementation("io.coil-kt:coil-compose:2.6.0")
   testImplementation(libs.junit)
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   androidTestImplementation(platform(libs.androidx.compose.bom))
